@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -82,24 +84,30 @@ public class CommandImplement {
 			
 			if (lastmodified) { 	// option 't' --> last modified
 				System.out.println("<Last Modified>\n");
-				ArrayList<String> modified = new ArrayList<String>();
+				//ArrayList<String> modified = new ArrayList<String>();
 				
 				for (File toCheck : fileList) {
 					long currTimeModified = toCheck.lastModified();
-					String strVer = new String(Long.toString(currTimeModified));
-					modified.add(strVer);
+					String pattern = "yyyy-MM-dd hh:mm aa";
+					SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+					Date lastModifiedDate = new Date( currTimeModified );
+
+					System.out.println( "The file " + toCheck + " was last modified on " + simpleDateFormat.format( lastModifiedDate ) );
+					//String strVer = new String(Long.toString(currTimeModified));
+					//modified.add(strVer);
 				}
-				
+				/*
 				Collections.sort(modified);
 
 				for (int i = modified.size()-1; i >= 0; i--) {
 					for (File toCheck : fileList) {
 						long currTimeModified = toCheck.lastModified();
 						if(Long.parseLong(modified.get(i)) == currTimeModified) {
-							System.out.println(toCheck.getName());
+							System.out.println(toCheck.getName() + currTimeModified);
 						}
 					}
 				}
+				*/
 			}
 			
 			if (size) { 	//option 'h' --> files by size
