@@ -2,6 +2,7 @@ package edu.handong.analysis;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -12,69 +13,118 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
-import edu.handong.analysis.utils.Util;;
-
 public class CommandImplement {
 	private String path;
 	private boolean help;
-	private boolean line;
+	private boolean unSorted;
+	private boolean sorted;
 	private boolean reverse;
-	private boolean absolutePath;
+	private boolean lastmodified;
+	private boolean size;
 	
 	public void run(String[] args) {
 		Options options = createOptions();
 		
 		if (parseOptions(options, args)) {
-			if (help) { 	// option 'h' --> help
+			if (help) { 	// option 'i' --> help
 				printHelp(options);
 				return;
 			}
-			
-			if (path == null) { 	// option 'p' --> set path
+	
+			if (path == null) { 	// option 'ls' --> set path
 				System.out.println("Please enter path for option p");
 				path = System.getProperty("user.dir");
 			}
-			else {
-				try {
-					if (!new File(path).isDirectory()) {
-						throw new Util("\nNot directory! Please enter path for option p");
-					}
-				} catch (Util e) {
-					System.out.println(e.getMessage());
-					return;
-				}
-			}
 			
 			File file = new File(path);
-			String[] files = file.list();
+			File[] fileList = file.listFiles();
+			ArrayList<String> names = new ArrayList<String>();
+			ArrayList<String> paths = new ArrayList<String>();
 			
-			if (line) {	// option 'l' --> ls
+			for(File onefile: fileList) {
+				  if(onefile.isFile()) {
+				    String tempPath = onefile.getParent();
+				    paths.add(tempPath);
+				    
+				    String tempFileName = onefile.getName();
+				    names.add(tempFileName);
+				  }
+				}
+			
+			if (unSorted) {	// option 'f' --> unsorted
 				System.out.println("<File list>\n");
 				
-				for (String onefile : files) {
+				for (String onefile : names) {
 					System.out.println(onefile);
 				}
 				System.out.println("\n");
 			}
 			
-			if (reverse) { 	// option 'r' --> reverse ls
-				List<String> list = Arrays.asList(files);
-				Collections.reverse(list);
-				files = list.toArray(new String[list.size()]);
+			if (sorted) {	// option 'a' --> sorted
+				Collections.sort(names);
+				System.out.println("<Sorted file list>\n");
 				
+				for (String onefile : names) {
+					System.out.println(onefile);
+				}
+				System.out.println("\n");
+			}
+			
+			if (reverse) { 	// option 'r' --> reversed
+				Collections.reverse(names);
 				System.out.println("<Reverse file list>\n");
 				
-				for (String onefile : files) {
+				for (String onefile : names) {
 					System.out.println(onefile);
 				}
 				System.out.println("\n");
 			}
 			
-			if (absolutePath) { 	// option 'a' --> absolute path
-				System.out.println("<Absolute path>\n");
-				System.out.println(file.getAbsolutePath() + "\n");
+			if (lastmodified) { 	// option 't' --> last modified
+				System.out.println("<Last Modified>\n");
+				ArrayList<String> modified = new ArrayList<String>();
+				
+				for (File toCheck : fileList) {
+					long currTimeModified = toCheck.lastModified();
+					String strVer = new String(Long.toString(currTimeModified));
+					modified.add(strVer);
+				}
+				
+				Collections.sort(modified);
+
+				for (int i = modified.size()-1; i >= 0; i--) {
+					for (File toCheck : fileList) {
+						long currTimeModified = toCheck.lastModified();
+						if(Long.parseLong(modified.get(i)) == currTimeModified) {
+							System.out.println(toCheck.getName());
+						}
+					}
+				}
 			}
 			
+			if (size) { 	//option 'h' --> files by size
+				System.out.println("<Files by size>\n");
+				ArrayList<String> sortedSize = new ArrayList<String>();
+				
+				for (File toCheck : fileList) {
+					long currSize = toCheck.length();
+					String strVer = new String(Long.toString(currSize));
+					sortedSize.add(strVer);
+				}
+				
+				Collections.sort(sortedSize);
+
+				for (int i = sortedSize.size()-1; i >= 0; i--) {
+					for (File onefile : fileList) {
+						long currSize = onefile.length();
+						if(Long.parseLong(sortedSize.get(i)) == currSize) {
+							System.out.println(onefile.getName());
+						}
+					}
+				}
+				
+				System.out.println("\n");
+			}
 		}
 	}
 	
@@ -84,11 +134,13 @@ public class CommandImplement {
 		try {
 			CommandLine cmd = parser.parse(options,  args);
 			
-			path = cmd.getOptionValue("p");
-			line = cmd.hasOption("l");
-			help = cmd.hasOption("h");
+			path = cmd.getOptionValue("ls");
+			unSorted = cmd.hasOption("f");
+			sorted = cmd.hasOption("a");
+			help = cmd.hasOption("i");
 			reverse = cmd.hasOption("r");
-			absolutePath = cmd.hasOption("a");
+			lastmodified = cmd.hasOption("t");
+			size = cmd.hasOption("h");
 			
 		} catch (Exception e) {
 			printHelp(options);
@@ -101,21 +153,29 @@ public class CommandImplement {
 	private Options createOptions() {
 		Options options = new Options();
 		
-		options.addOption(Option.builder("p").longOpt("path")
+		options.addOption(Option.builder("ls").longOpt("path")
 				.desc("Set a path of a directory")
 				.hasArg()
 				.build());
-		options.addOption(Option.builder("l").longOpt("line")
-				.desc("Print out list line")
+		options.addOption(Option.builder("f").longOpt("line")
+				.desc("Print out unsorted file list")
 				.build());
-		options.addOption(Option.builder("h").longOpt("help")
+		options.addOption(Option.builder("a").longOpt("sorted")
+				.desc("Print out sorted list")
+				.build());
+		options.addOption(Option.builder("i").longOpt("help")
 				.desc("Help")
 				.build());
 		options.addOption(Option.builder("r").longOpt("reverse")
-				.desc("Display list reverse order")
+				.desc("Print out list reverse order")
 				.build());
-		options.addOption(Option.builder("a").longOpt("absolute")
-				.desc("Print out absolute path of present directory")
+		options.addOption(Option.builder("t").longOpt("lastModified")
+				.desc("Print out last modified")
+				.build());
+		options.addOption(
+				Option.builder("h").longOpt("size")
+				.desc("Print out the size of files")
+				.argName("size")
 				.build());
 		
 		return options;
@@ -126,7 +186,7 @@ public class CommandImplement {
 		HelpFormatter formatter = new HelpFormatter();
 		String header = "Command 'ls' implementing program";
 		String footer = "";
-		formatter.printHelp("Implementing the 'zip' command", header, options, footer, true);
+		formatter.printHelp("Implementing the 'ls' command", header, options, footer, true);
 	}
 	
 }
