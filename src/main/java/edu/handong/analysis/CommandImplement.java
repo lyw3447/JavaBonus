@@ -34,7 +34,7 @@ public class CommandImplement {
 			}
 	
 			if (path == null) { 	// option 'ls' --> set path
-				System.out.println("Please enter path for option p");
+				System.out.println("Please enter path for option ls");
 				path = System.getProperty("user.dir");
 			}
 			
