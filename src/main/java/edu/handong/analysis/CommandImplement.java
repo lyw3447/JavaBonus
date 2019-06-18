@@ -99,7 +99,7 @@ public class CommandImplement {
 			
 			if (size) { 	//option 'h' --> print out file size
 				System.out.println("<Files by size>\n");
-				String size = ""
+				String size = "";
 					
 				for (File onefile : fileList) {
 					long filesize = onefile.length();
