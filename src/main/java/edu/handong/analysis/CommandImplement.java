@@ -84,8 +84,7 @@ public class CommandImplement {
 			
 			if (lastmodified) { 	// option 't' --> last modified
 				System.out.println("<Last Modified>\n");
-				//ArrayList<String> modified = new ArrayList<String>();
-				
+		
 				for (File toCheck : fileList) {
 					long currTimeModified = toCheck.lastModified();
 					String pattern = "yyyy-MM-dd hh:mm aa";
@@ -93,44 +92,19 @@ public class CommandImplement {
 					Date lastModifiedDate = new Date( currTimeModified );
 
 					System.out.println( "The file " + toCheck + " was last modified on " + simpleDateFormat.format( lastModifiedDate ) );
-					//String strVer = new String(Long.toString(currTimeModified));
-					//modified.add(strVer);
 				}
-				/*
-				Collections.sort(modified);
-
-				for (int i = modified.size()-1; i >= 0; i--) {
-					for (File toCheck : fileList) {
-						long currTimeModified = toCheck.lastModified();
-						if(Long.parseLong(modified.get(i)) == currTimeModified) {
-							System.out.println(toCheck.getName() + currTimeModified);
-						}
-					}
-				}
-				*/
 			}
 			
-			if (size) { 	//option 'h' --> files by size
+			if (size) { 	//option 'h' --> print out file size
 				System.out.println("<Files by size>\n");
-				ArrayList<String> sortedSize = new ArrayList<String>();
-				
-				for (File toCheck : fileList) {
-					long currSize = toCheck.length();
-					String strVer = new String(Long.toString(currSize));
-					sortedSize.add(strVer);
-				}
-				
-				Collections.sort(sortedSize);
+				String size = ""
+					
+				for (File onefile : fileList) {
+					long filesize = onefile.length();
+					size = Long.toString(filesize) + "bytes";
+					System.out.println(onefile.getName() + "File Size : " + size);
 
-				for (int i = sortedSize.size()-1; i >= 0; i--) {
-					for (File onefile : fileList) {
-						long currSize = onefile.length();
-						if(Long.parseLong(sortedSize.get(i)) == currSize) {
-							System.out.println(onefile.getName());
-						}
-					}
 				}
-				
 				System.out.println("\n");
 			}
 		}
