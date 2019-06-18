@@ -14,6 +14,7 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import org.apache.commons.io.comparator.LastModifiedFileComparator;
 
 public class CommandImplement {
 	private String path;
@@ -84,7 +85,8 @@ public class CommandImplement {
 			
 			if (lastmodified) { 	// option 't' --> last modified
 				System.out.println("<Last Modified>\n");
-		
+				
+				//Arrays.sort(fileList, LastModifiedFileComparator.LASTMODIFIED_COMPARATOR);
 				for (File toCheck : fileList) {
 					long currTimeModified = toCheck.lastModified();
 					String pattern = "yyyy-MM-dd hh:mm aa";
